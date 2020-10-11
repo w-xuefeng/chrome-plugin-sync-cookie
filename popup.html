@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>sync-cookie</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style>
+      body {
+        font-family: 'Microsoft Yahei';
+        width: 400px;
+        min-height: 100px;
+        padding: 16px;
+        margin: 0;
+        padding-top: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .center {
+        text-align: center;
+      }
+
+      .line {
+        display: flex;
+        font-size: 14px;
+      }
+
+      .button {
+        display: inline-block;
+        position: relative;
+        min-width: 120px;
+        padding: 0 20px;
+        height: 32px;
+        line-height: 32px;
+        border-radius: 2px;
+        font-size: 0.9em;
+        background-color: #fff;
+        color: #646464;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+        transition: all 500ms;
+      }
+
+      .button > paper-ripple {
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .button.narrow {
+        width: 60px;
+      }
+
+      .button.grey {
+        background-color: #eee;
+      }
+
+      .button.blue {
+        background-color: #4285f4;
+        color: #fff;
+      }
+
+      .button.green {
+        background-color: #0f9d58;
+        color: #fff;
+      }
+
+      .button.raised {
+        transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition-delay: 0.2s;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+      }
+
+      .button.raised:active {
+        box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2);
+        transition-delay: 0s;
+      }
+
+      .line:nth-child(2),
+      .button {
+        margin-top: 15px;
+      }
+
+      .input {
+        border: none;
+        border-bottom: 1px solid grey;
+        outline: none;
+        width: 300px;
+      }
+
+      .right {
+        float: right;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="box">
+      <div class="line">
+        <label for="local">本地地址：</label>
+        <input type="url" id="local" class="input" placeholder="本地地址" />
+      </div>
+      <div class="line">
+        <label for="test">调试地址：</label>
+        <input type="url" id="test" class="input" placeholder="调试地址" />
+      </div>
+      <div class="button raised blue right">
+        <div class="center">从调试地址同步 Cookie</div>
+        <paper-ripple></paper-ripple>
+      </div>
+    </div>
+  </body>
+	<script src="lib/jquery.min.js"></script>
+	<script src="js/utils/tools.js"></script>
+  <script src="js/popup.js"></script>
+</html>
