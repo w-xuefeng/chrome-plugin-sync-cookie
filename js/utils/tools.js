@@ -2,16 +2,16 @@ const ERROR_COLOR = `color:red`
 const INFO_COLOR = `color:deepskyblue`
 const SUCCESS_COLOR = `color:rgb(0,202,75)`
 
-const logError = (content) =>
+export const logError = (content) =>
   console.log(`%c[sync-cookie tips]: ${content}`, ERROR_COLOR)
 
-const logInfo = (content) =>
+export const logInfo = (content) =>
   console.log(`%c[sync-cookie tips]: ${content}`, INFO_COLOR)
 
-const logSuccess = (content) =>
+export const logSuccess = (content) =>
   console.log(`%c[sync-cookie tips]: ${content}`, SUCCESS_COLOR)
 
-const toast = ({ msg, duration = 3000, location = 'bottom' }) => {
+export const toast = ({ msg, duration = 3000, location = 'bottom' }) => {
   const vlocation =
     location === 'bottom'
       ? 'bottom: 10%;'
@@ -48,7 +48,7 @@ const toast = ({ msg, duration = 3000, location = 'bottom' }) => {
   }, duration)
 }
 
-const toastAndLog = (content, logType = 'info', toastOpt) => {
+export const toastAndLog = (content, logType = 'info', toastOpt) => {
   switch (logType) {
     case 'info':
       logInfo(content)
@@ -66,52 +66,24 @@ const toastAndLog = (content, logType = 'info', toastOpt) => {
   toast({ ...toastOpt, msg: content })
 }
 
-const getDomain = (url) => {
-  const server = url.match(/:\/\/(.[^/:#?]+)/)[1]
-  const parts = server.split('.')
-  const isip = !isNaN(parseInt(server.replace('.', ''), 10))
-  let domain
-  if (parts.length <= 1 || isip) {
-    domain = server
-  } else {
-    domains = new Array()
-    domains[0] = parts[parts.length - 1]
-    for (i = 1; i < parts.length; i++) {
-      domains[i] = parts[parts.length - i - 1] + '.' + domains[i - 1]
-    }
-    if (typeof domain == 'undefined') {
-      domain = server
-    }
-  }
-  return domain
+export const getDomain = (url) => {
+  const a = document.createElement('a')
+  a.href = url
+  return a.hostname
 }
 
-const getUrl = () => {
+export const getUrl = () => {
   const localUrl = localStorage.getItem('localUrl') || null
   const testUrl = localStorage.getItem('testUrl') || null
   return { localUrl, testUrl }
 }
 
-const savaUrl = (localUrl, testUrl) => {
+export const savaUrl = (localUrl, testUrl) => {
   localStorage.setItem('localUrl', localUrl)
   localStorage.setItem('testUrl', testUrl)
 }
 
-const preUrl = () => {
-  chrome.tabs.getSelected(null, (tab) => {
-    const clocalUrl = $('#local').val()
-    const ctestUrl = $('#test').val()
-    const { localUrl, testUrl } = getUrl()
-    if ((!clocalUrl && localUrl) || tab.url) {
-      $('#local').val(localUrl || tab.url)
-    }
-    if (!ctestUrl && testUrl) {
-      $('#test').val(testUrl)
-    }
-  })
-}
-
-const setCookies = (url, cookie, expireSecond) => {
+export const setCookies = (url, cookie, expireSecond) => {
   const domain = getDomain(url)
   const param = {
     url: `https://${domain}`,
@@ -137,7 +109,7 @@ const setCookies = (url, cookie, expireSecond) => {
   })
 }
 
-const getAllCookies = (url) =>
+export const getAllCookies = (url) =>
   new Promise((resolve, reject) => {
     chrome.cookies.getAll({ url }, (cookies) => {
       if (cookies) {
@@ -148,7 +120,7 @@ const getAllCookies = (url) =>
     })
   })
 
-const getCookies = (url, key) =>
+export const getCookies = (url, key) =>
   new Promise((resolve, reject) => {
     chrome.cookies.get(
       {
@@ -164,7 +136,7 @@ const getCookies = (url, key) =>
     )
   })
 
-const removeCookies = (url, key) =>
+export const removeCookies = (url, key) =>
   new Promise((resolve) => {
     chrome.cookies.remove(
       {
@@ -177,3 +149,23 @@ const removeCookies = (url, key) =>
       }
     )
   })
+
+export const sendMsgToBackground = (_dataType, data) => {
+  chrome.runtime.sendMessage({ data, _dataType, _dataFrom: 'popup' })
+}
+
+export const receiveMsg = (msgEvent) => {
+  chrome.extension.onMessage.addListener((message, sender, sendResponse) => {
+    const { _dataFrom, _dataType, data } = message
+    msgEvent &&
+      msgEvent[_dataFrom] &&
+      msgEvent[_dataFrom][_dataType] &&
+      typeof msgEvent[_dataFrom][_dataType] === 'function' &&
+      msgEvent[_dataFrom][_dataType](data)
+  })
+}
+
+export const popOnCookieChange = (local, url, open) => {
+  const domain = getDomain(url)
+  sendMsgToBackground('onCookieChange', { local, domain, open })
+}
