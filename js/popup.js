@@ -34,14 +34,6 @@ const RootComponent = {
        */
       hasListen: false,
       /**
-       * 提交同步 cookie 按钮的文案
-       */
-      submitBtnText: '从调试地址同步 Cookie',
-      /**
-       * 切换监听 cookie 的文案
-       */
-      switchText: '未开启监听 Cookie 变化',
-      /**
        * 本地地址 cookie 要同步的目的地址
        */
       localUrl: getUrl().localUrl || '',
@@ -73,7 +65,6 @@ const RootComponent = {
      */
     const prevSync = (localUrl, testUrl) => {
       state.loading = true
-      state.submitBtnText = '同步中...'
       savaUrl(localUrl, testUrl)
       logInfo('开始同步')
     }
@@ -82,7 +73,6 @@ const RootComponent = {
      * cookie 同步后的要处理的事情
      */
     const afterSync = () => {
-      state.submitBtnText = '从调试地址同步 Cookie'
       state.loading = false
       logInfo('执行结束')
     }
@@ -116,10 +106,9 @@ const RootComponent = {
       state.listenLoading = false
       state.hasListen =
         open || JSON.parse(localStorage.getItem('hasListen') || false)
-      state.switchText = state.hasListen
-        ? '已开启监听 Cookie 变化'
-        : '未开启监听 Cookie 变化'
-      logInfo(state.switchText)
+      logInfo(
+        state.hasListen ? '已开启监听 Cookie 变化' : '未开启监听 Cookie 变化'
+      )
     }
 
     /**
@@ -156,7 +145,7 @@ const RootComponent = {
 
     /**
      * 开启或关闭监听 cookie
-     * @param {Event} e 
+     * @param {Event} e
      */
     const onSwitch = (e) => {
       const {
@@ -175,7 +164,6 @@ const RootComponent = {
       }
 
       state.listenLoading = true
-      state.switchText = '执行中...'
 
       popOnCookieChange(localUrl.value, testUrl.value, checked)
     }
@@ -247,11 +235,19 @@ const RootComponent = {
           h(
             'label',
             { for: 'switch', class: 'switch-label' },
-            state.switchText
+            state.listenLoading
+              ? '执行中...'
+              : state.hasListen
+              ? '已开启监听 Cookie 变化'
+              : '未开启监听 Cookie 变化'
           ),
         ]),
         h('div', { class: 'button raised blue', onClick: onSubmit }, [
-          h('div', { class: 'center' }, state.submitBtnText),
+          h(
+            'div',
+            { class: 'center' },
+            state.loading ? '同步中...' : '从调试地址同步 Cookie'
+          ),
           h('paper-ripple'),
         ]),
       ]),
